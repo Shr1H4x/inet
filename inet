@@ -1,0 +1,36 @@
+inet() {
+  echo -e "Interface         IP_Address        Broadcast           Subnet_Mask        CIDR"
+  echo "----------------------------------------------------------------------------"
+  ip -4 -o addr show | awk '
+    function cidr_to_mask(cidr) {
+      mask = "";
+      for (i = 0; i < 4; i++) {
+        if (cidr >= 8) {
+          mask = mask "255";
+          cidr -= 8;
+        } else {
+          val = 256 - 2^(8 - cidr);
+          mask = mask val;
+          cidr = 0;
+        }
+        if (i < 3) mask = mask ".";
+      }
+      return mask;
+    }
+    {
+      split($4, a, "/");
+      ip_raw = a[1];
+      cidr = a[2];
+      mask = cidr_to_mask(cidr);
+      brd = "N/A";
+      for (i = 1; i <= NF; i++) if ($i == "brd") brd = $(i + 1);
+      printf "%-17s %-17s %-20s %-18s /%s\n", $2, ip_raw, brd, mask, cidr;
+    }' | awk 'BEGIN{
+      red="\033[31m"; blue="\033[34m"; green="\033[32m"; reset="\033[0m"
+    }
+    NR==1 {print $0; next}
+    {
+      printf "%s%-17s%s %s%-17s%s %s%-20s%s %s%-18s%s /%s\n",
+        "", $1, "", red, $2, reset, blue, $3, reset, green, $4, reset, $5
+    }'
+}
