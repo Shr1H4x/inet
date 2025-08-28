@@ -18,8 +18,8 @@ This repo provides a custom shell function `inet` that shows your system’s net
 
 ### 1. Clone this repo
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/ShriHax-21/inet.git
+cd inet
 ````
 
 ### 2. Add the function to your shell config
